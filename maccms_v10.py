@@ -18,10 +18,8 @@ fi
 EOF'''
 
 # 登录数据库修改密码
-mysql_passwd = '''cat << EOF > /tmp/mysqlpasswd.sh
-mysqlpass="$(grep 'temporary password' /var/log/mysqld.log | awk '{print $11}')"
-mysql --connect-expired-password -uroot -p''$mysqlpass'' -e "alter user 'root'@'localhost' identified by '1qaz@WSX';"
-EOF'''
+mysql_passwd = '''mysqlpass="$(grep 'temporary password' /var/log/mysqld.log | awk '{print $11}')"
+mysql --connect-expired-password -uroot -p''$mysqlpass'' -e "alter user 'root'@'localhost' identified by '1qaz@WSX';"'''
 
 # 添加nginx的php配置
 nginx_php = '''location ~ .php$ {
@@ -84,7 +82,8 @@ def install_mysql():
     os.system('yum -y install mysql-community-server')
     os.system('systemctl start mysqld')
     os.system('systemctl enable mysqld')
-    os.system(mysql_passwd)
+    with open('/tmp/mysqlpasswd.sh','w') as f:
+        f.write(mysql_passwd)
     os.system('bash /tmp/mysqlpasswd.sh')
     
 # nginx添加php配置
@@ -122,6 +121,8 @@ if __name__ == "__main__":
         code = check_lnmp()
         if int(code) == 200:
             install_maccms()
+            print('----------部署成功----------')
+            print('请访问http://127.0.0.1/index.php')
         else:
             print('----------LNMP平台部署失败----------')
     else:
