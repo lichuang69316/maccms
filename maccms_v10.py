@@ -70,7 +70,7 @@ def install_nginx():
 
 # 安装配置php
 def install_php():
-    os.system('yum -y php*')
+    os.system('yum -y remove php*')
     os.system('yum -y install php70w php70w-gd php70w-mysql php70w-fpm php70w-mbstring')
     os.system(php_ini)
     os.system("bash /tmp/php.sh")
